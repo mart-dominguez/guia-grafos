@@ -1,6 +1,7 @@
 package died2016.grafos.modelo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -182,7 +184,6 @@ public class Grafo<T> {
             while(!pendientes.isEmpty()){
                 Vertice<T> actual = pendientes.pop();
                 if(esAdyacente8(actual, v2)) {
-                    System.out.println("es adyacente marcados: "+v1.getValor()+" --> "+v2.getValor());
                     System.out.println(marcados);
                     return true;
                 }                
@@ -201,38 +202,36 @@ public class Grafo<T> {
         
          public List<String> caminos(Vertice<T> v1,Vertice<T> v2){
             List<String> caminos = new ArrayList<String>();
-            List<Vertice<T>> caminoActual = new ArrayList<Vertice<T>>();
-
-            Stack<Vertice<T>> pendientes = new Stack<Vertice<T>>();
-            HashSet<Vertice<T>> marcados = new HashSet<Vertice<T>>();            
-            pendientes.add(v1);
-            marcados.add(v1);
-            
-            while(!pendientes.isEmpty()){
-                Vertice<T> actual = pendientes.peek();
-                caminoActual.add(actual);
-                if(esAdyacente8(actual, v2)) {
-                    caminoActual.add(v2);
-                    caminos.add(caminoActual.toString());
-                    caminoActual.remove(v2);
-                    caminoActual.remove(actual);
-                    marcados.add(v2);
-                }                
-                List<Vertice<T>> adyacentes = this.getAdyacentes(actual);
-                for(Vertice<T> v : adyacentes){
-                    if(!marcados.contains(v)){ 
-                        pendientes.push(v);
-                        marcados.add(v);
-                    }else{
-                        caminoActual.remove(v);
-                        pendientes.remove(v);
-                    }
-		}
-                
-            }
-            System.out.println(caminos);
+            Stack<Vertice<T>> path  = new Stack<Vertice<T>>();   // the current path
+            Set<Vertice<T>> onPath  = new HashSet<Vertice<T>>();     // the set of vertices on the path
+            buscarTodos(v1,v2,path,onPath,caminos);
             return caminos;
         }
+         
+
+
+    // use DFS
+    private void buscarTodos(Vertice<T> v, Vertice<T> t,Stack<Vertice<T>> path,Set<Vertice<T>> onPath,List<String> caminos) {
+
+        // add node v to current path from s
+        path.push(v);
+        onPath.add(v);
+
+        // found path from s to t - currently prints in reverse order because of stack
+        if (v.equals(t)) {
+            caminos.add(path.toString());
+        // consider all neighbors that would continue path with repeating a node
+        }else {
+            for (Vertice<T> w : this.getAdyacentes(v)) {
+                if (!onPath.contains(w)) buscarTodos(w, t,path,onPath,caminos);
+            }
+        }
+
+        // done exploring from v, so remove from path
+        path.pop();
+        onPath.remove(v);
+    
+         }
         
         public boolean existeCiclo(){            
             /*if(esAdyacente8(v1, v2)) return true;
@@ -315,7 +314,35 @@ public class Grafo<T> {
          */
         public Integer excentricidad(Vertice<T> v1){
             return 0;
-        }
-        
+        }       
+	
+	
+	/**
+	 * Chequea si tiene ciclos. 
+	 * Para esto toma cada nodo y realiza un recorrido en profundidad, pero en cada paso chequea si el nodo al cual le solicitar
+	 * los adyacentes no est en la lista de adyacentes. Si lo est hay ciclos.
+	 * @return
+	 */
+	public boolean tiene2Caminos(){
+		for(Vertice<T> vertice : this.vertices){		
+			Stack<Vertice<T>> aVisitar= new Stack<Vertice<T>>(); 
+			//para cada vertice busco el recorrido en profundidad			
+			Set<Vertice<T>> visitados = new TreeSet<Vertice<T>>();
+			aVisitar.push(vertice);			
+			while(!aVisitar.isEmpty()){				
+				Vertice<T> aux = aVisitar.pop();				
+				for(Vertice<T> ady :this.getAdyacentes(aux)){
+					if(visitados.contains(ady)) {
+						System.out.println("ciclo entre "+aux.getValor()+" : "+ady.getValor());
+						return true;
+					}else{
+						aVisitar.add(ady);
+					}
+				}
+				visitados.add(aux);
+			}						
+		}		
+		return false;
+	}        
 
 }

@@ -115,7 +115,7 @@ public class TestGrafo {
             assertTrue(grafo.existeCaminoIter(vertFinal4, vertFinal2));
 	}
         
-                @Test
+                @Ignore
 	public void testCaminosRec() {
             Vertice<String> vertInicial = new Vertice<String>("D");
             Vertice<String> vertFinal1 = new Vertice<String>("B");
@@ -134,7 +134,7 @@ public class TestGrafo {
             assertTrue(grafo.existeCaminoRec(vertFinal4, vertFinal2));
         }
         
-        @Test
+        @Ignore
 	public void testCaminosNSaltos() {
             Vertice<String> vertInicial = new Vertice<String>("D");
             Vertice<String> vertFinal3 = new Vertice<String>("H");
@@ -149,7 +149,7 @@ public class TestGrafo {
         }
 
                 
-        @Test
+        @Ignore
 	public void testCaminosNSaltosRec() {
             Vertice<String> vertInicial = new Vertice<String>("D");
             Vertice<String> vertFinal3 = new Vertice<String>("H");
